@@ -58,7 +58,7 @@ const Avatars = {
 
 const Comments = {
   MIN: 0,
-  MAX: 5,
+  MAX: 30,
 };
 
 const photos = [];
@@ -78,7 +78,7 @@ const addComment = (id) => ({
 });
 
 const addComments = () => {
-  let id = 0;
+  let id = 4518963;
   const createCommentsArray = () => {
     const comments = [];
     for (let i = 0; i < getRandomInteger(Comments.MIN, Comments.MAX); i++) {
