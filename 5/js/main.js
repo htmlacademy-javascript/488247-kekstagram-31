@@ -64,10 +64,9 @@ const Comments = {
 const photos = [];
 
 const getRandomInteger = (min, max) => {
-  const lower = Math.floor(Math.min(min, max));
-  const upper = Math.ceil(Math.max(min, max));
-  const result = Math.random() * (upper - lower + 1) + lower;
-  return Math.floor(result);
+  min = Math.ceil(Math.min(min, max));
+  max = Math.floor(Math.max(min, max));
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
 const addComment = (id) => ({
@@ -78,25 +77,19 @@ const addComment = (id) => ({
 });
 
 const addComments = () => {
-  let id = 4518963;
-  const createCommentsArray = () => {
-    const comments = [];
-    for (let i = 0; i < getRandomInteger(Comments.MIN, Comments.MAX); i++) {
-      comments.push(addComment(id += 1));
-    }
-    return comments;
-  };
-  return createCommentsArray;
+  const comments = [];
+  for (let i = 0; i < getRandomInteger(Comments.MIN, Comments.MAX); i++) {
+    comments.push(addComment(i));
+  }
+  return comments;
 };
-
-const addCommentsToPhoto = addComments();
 
 const addPhoto = (id) => ({
   id,
   url: `./photos/${id}.jpg`,
   description: DESCRIPTIONS[id - 1],
   likes: getRandomInteger(Likes.MIN, Likes.MAX),
-  comments: addCommentsToPhoto(),
+  comments: addComments(),
 });
 
 const addPhotos = () => {
