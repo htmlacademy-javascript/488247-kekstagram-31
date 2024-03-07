@@ -1,4 +1,4 @@
-import { getRandomInteger, createObjectsArray } from './util';
+import { getRandomInteger, createObjectsArray } from './util.js';
 
 const QUANTITY = 25;
 

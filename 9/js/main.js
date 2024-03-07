@@ -1,3 +1,6 @@
-import { renderPictures } from './rendering-pictures';
+import { addPhoto, QUANTITY } from './data.js';
+import { createObjectsArray } from './util.js';
+import { renderPictures } from './rendering-pictures.js';
 
-renderPictures();
+const photos = createObjectsArray(addPhoto, QUANTITY);
+renderPictures(photos);
