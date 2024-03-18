@@ -68,7 +68,9 @@ imgDescription.addEventListener('keydown', (evt) => evt.stopPropagation());
 const onSubmitForm = (evt) => {
   evt.preventDefault();
 
-  pristine.validate();
+  if (pristine.validate()) {
+    imgUploadForm.submit();
+  }
 };
 
 uploadFile.addEventListener('change', onSelectPhoto);
