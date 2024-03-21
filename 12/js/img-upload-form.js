@@ -1,4 +1,7 @@
-import { isEscapeKey } from './util.js';
+import { isEscapeKey, numDecline } from './util.js';
+
+const MAX_HASHTAGS = 5;
+const MAX_SYMBOLS = 20;
 
 const imgUpload = document.querySelector('.img-upload');
 const imgUploadForm = document.querySelector('.img-upload__form');
@@ -6,7 +9,8 @@ const uploadOverlay = imgUpload.querySelector('.img-upload__overlay');
 const uploadFile = imgUpload.querySelector('#upload-file');
 const imgUploadCancel = imgUpload.querySelector('.img-upload__cancel');
 const inputHashtag = imgUpload.querySelector('.text__hashtags');
-const imgDescription = imgUpload.querySelector('.text__description');
+
+let errorMessage = '';
 
 const pristine = new Pristine(imgUploadForm, {
   classTo: 'img-upload__form',
@@ -14,31 +18,62 @@ const pristine = new Pristine(imgUploadForm, {
   errorTextClass: 'img-upload__field-wrapper--error',
 });
 
+const error = () => errorMessage;
 
-const isHashtagsValid = (hashTags) => hashTags.match(/^(#[а-яё\w\d]{1,19}\s*){0,5}$/i);
+const isHashtagsValid = (value) => {
+  errorMessage = '';
 
-const isHashtagsUnique = (hashTags) => {
-  const hashTagsArray = hashTags.trim().toLowerCase().split(' ');
+  const inputText = value.toLowerCase().trim();
 
-  for (let i = 0; i < hashTagsArray.length - 1; i++) {
-    if (hashTagsArray.slice(i + 1).includes(hashTagsArray[i])) {
-      return false;
-    }
+  if (!inputText) {
+    return true;
   }
-  return true;
+
+  const inputArray = inputText.split(/\s+/);
+
+  const rules = [
+    {
+      check: inputArray.some((item) => item === '#'),
+      error: 'Хештег не может состоять только из одной решётки',
+    },
+    {
+      check: inputArray.some((item) => item.slice(1).includes('#')),
+      error: 'Хештеги разделяются пробелами',
+    },
+    {
+      check: inputArray.some((item) => item[0] !== '#'),
+      error: 'Хештег должен начинаться с символа \'#\'',
+    },
+    {
+      check: inputArray.some((item, num, array) => array.includes(item, num + 1)),
+      error: 'Хештеги не должны повторяться',
+    },
+    {
+      check: inputArray.some((item) => item.length > MAX_SYMBOLS),
+      error: `Максимальная длина одного хештега ${MAX_SYMBOLS} символов, включая решётку`,
+    },
+    {
+      check: inputArray.length > MAX_HASHTAGS,
+      error: `Нельзя указать больше ${MAX_HASHTAGS} ${numDecline(
+        MAX_HASHTAGS, 'хештега', 'хештегов', 'хештегов'
+      )}`,
+    },
+    {
+      check: inputArray.some((item) => !/^#[a-zа-яё0-9]{1,19}$/i.test(item)),
+      error: 'Хештег содержит недопустимые символы',
+    },
+  ];
+
+  return rules.every((rule) => {
+    const isInvalid = rule.check;
+    if (isInvalid) {
+      errorMessage = rule.error;
+    }
+    return !isInvalid;
+  });
 };
 
-pristine.addValidator(inputHashtag,
-  isHashtagsValid,
-  'хештеги должны начинаться с символа \'#\', содержать буквы и цифры, быть не длинее 20 символов и их не должно быть больше пяти',
-  2,
-  false);
-
-pristine.addValidator(inputHashtag,
-  isHashtagsUnique,
-  'хештеги не должны повторяться',
-  2,
-  false);
+pristine.addValidator(inputHashtag, isHashtagsValid, error, 2, false);
 
 const onImgUploadClose = () => {
   document.body.classList.remove('modal-open');
@@ -48,11 +83,18 @@ const onImgUploadClose = () => {
 };
 
 function onEscapeKeydown (evt) {
-  if(isEscapeKey(evt)) {
+  if(isEscapeKey(evt)
+    && !evt.target.classList.contains('text__hashtags')
+    && !evt.target.classList.contains('text__description')
+  ) {
     evt.preventDefault();
     onImgUploadClose();
   }
 }
+
+const onHashtagInput = () => {
+  isHashtagsValid(inputHashtag.value);
+};
 
 const onSelectPhoto = () => {
   document.body.classList.add('modal-open');
@@ -61,17 +103,16 @@ const onSelectPhoto = () => {
   document.addEventListener('keydown', onEscapeKeydown);
 };
 
-inputHashtag.addEventListener('keydown', (evt) => evt.stopPropagation());
-
-imgDescription.addEventListener('keydown', (evt) => evt.stopPropagation());
-
 const onSubmitForm = (evt) => {
   evt.preventDefault();
 
   if (pristine.validate()) {
+    inputHashtag.value = inputHashtag.value.trim().replaceAll(/\s+/g, ' ');
     imgUploadForm.submit();
   }
 };
+
+inputHashtag.addEventListener('input', onHashtagInput);
 
 uploadFile.addEventListener('change', onSelectPhoto);
 

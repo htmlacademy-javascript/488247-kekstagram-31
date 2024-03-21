@@ -22,8 +22,6 @@ const numDecline = (num, nominative, genitiveSingular, genitivePlural) => {
     : genitiveSingular;
 };
 
-const isEnterKey = (evt) => evt.key === 'Enter';
-
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
-export { getRandomInteger, createObjectsArray, isEscapeKey, isEnterKey, numDecline };
+export { getRandomInteger, createObjectsArray, isEscapeKey, numDecline };
