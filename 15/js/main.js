@@ -3,6 +3,7 @@ import { renderThumbnails } from './render-thumbnails.js';
 import './open-big-picture.js';
 import { changeFilter } from './img-filters.js';
 import { onFormSubmit, onImgUploadClose } from './img-upload-form.js';
+import './add-photo.js';
 
 const SHOW_MESSAGE_TIME = 5000;
 

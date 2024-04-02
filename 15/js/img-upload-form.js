@@ -32,12 +32,13 @@ let scale = 1;
 const onImgUploadClose = () => {
   document.body.classList.remove('modal-open');
   uploadOverlay.classList.add('hidden');
-  scale = 1;
-  img.style.transform = `scale(${scale})`;
   effectLevel.classList.add('hidden');
-  img.style.filter = 'none';
+  img.style.transform = '';
+  img.style.filter = '';
   submitButton.disabled = false;
+  scale = 1;
   imgUploadForm.reset();
+  pristine.reset(); // term
   document.removeEventListener('keydown', onEscapeKeydown);
 };
 
