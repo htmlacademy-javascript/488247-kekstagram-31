@@ -69,10 +69,7 @@ const isDescriptionValid = () => inputDescription.value.length <= MAX_DESCRIPTIO
 
 const pristine = new Pristine(imgUploadForm, {
   classTo: 'img-upload__form',
-  errorClass: 'img-upload__form--invalid',
-  successClass: 'img-upload__form--valid',
   errorTextParent: 'img-upload__field-wrapper',
-  errorTextTag: 'div',
   errorTextClass: 'img-upload__field-wrapper--error',
 });
 

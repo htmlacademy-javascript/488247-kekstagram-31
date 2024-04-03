@@ -1,4 +1,4 @@
-const FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+const FILE_TYPES = ['.gif', '.jpg', '.jpeg', '.png'];
 
 const uploadFile = document.querySelector('#upload-file');
 const preview = document.querySelector('.img-upload__preview img');

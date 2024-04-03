@@ -22,7 +22,7 @@ noUiSlider.create(slider, {
   format: {
     from: (value) => parseFloat(value),
     to: (value) => Number.isInteger(value)
-      ? value.toFixed(0)
+      ? value
       : value.toFixed(1),
   },
 });
@@ -44,7 +44,7 @@ const setEffect = (effect) => {
 
 const onEffectChange = (evt) => {
   const effect = evt.target.value;
-  img.style.filter = 'none';
+  img.style.filter = '';
 
   if (effect === 'none') {
     effectLevel.classList.add('hidden');

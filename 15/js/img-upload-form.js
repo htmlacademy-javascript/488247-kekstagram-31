@@ -7,7 +7,7 @@ import { showModal } from './show-modal.js';
 const SCALE_STEP = 0.25;
 
 const SubmitButtonText = {
-  IDLE: 'Сохранить',
+  IDLE: 'Опубликовать',
   SENDING: 'Сохраняю...',
 };
 
@@ -29,16 +29,26 @@ const submitButton = imgUploadForm.querySelector('.img-upload__submit');
 
 let scale = 1;
 
+const blockSubmitButton = () => {
+  submitButton.disabled = true;
+  submitButton.textContent = SubmitButtonText.SENDING;
+};
+
+const unblockSubmitButton = () => {
+  submitButton.disabled = false;
+  submitButton.textContent = SubmitButtonText.IDLE;
+};
+
 const onImgUploadClose = () => {
   document.body.classList.remove('modal-open');
   uploadOverlay.classList.add('hidden');
   effectLevel.classList.add('hidden');
   img.style.transform = '';
   img.style.filter = '';
-  submitButton.disabled = false;
   scale = 1;
+  unblockSubmitButton();
   imgUploadForm.reset();
-  pristine.reset(); // term
+  pristine.reset();
   document.removeEventListener('keydown', onEscapeKeydown);
 };
 
@@ -82,36 +92,26 @@ const onCommentInput = () => {
   submitButton.disabled = !isFormValid(inputHashtags.value);
 };
 
-const blockSubmitButton = () => {
-  submitButton.disabled = true;
-  submitButton.textContent = SubmitButtonText.SENDING;
+const onImgUploadFormSubmit = (evt) => {
+  evt.preventDefault();
+
+  if (pristine.validate()) {
+    inputHashtags.value = inputHashtags.value.trim().replaceAll(/\s+/g, ' ');
+    blockSubmitButton();
+    sendData(new FormData(evt.target))
+      .then(() => {
+        onImgUploadClose();
+        unblockSubmitButton();
+        showModal(successPopup, 'success');
+      })
+      .catch(() => {
+        unblockSubmitButton();
+        showModal(errorPopup, 'error');
+      });
+  }
 };
 
-const unblockSubmitButton = () => {
-  submitButton.disabled = false;
-  submitButton.textContent = SubmitButtonText.IDLE;
-};
-
-const onFormSubmit = (onSuccess) => {
-  imgUploadForm.addEventListener('submit', (evt) => {
-    evt.preventDefault();
-
-    if (pristine.validate()) {
-      blockSubmitButton();
-      inputHashtags.value = inputHashtags.value.trim().replaceAll(/\s+/g, ' ');
-      const formData = new FormData(evt.target);
-      sendData(formData)
-        .then(onSuccess)
-        .then(unblockSubmitButton)
-        .then(() => {
-          if (submitButton.textContent === SubmitButtonText.IDLE) {
-            showModal(successPopup, 'success');
-          }
-        })
-        .catch(() => showModal(errorPopup, 'error'));
-    }
-  });
-};
+imgUploadForm.addEventListener('submit', onImgUploadFormSubmit);
 
 uploadFile.addEventListener('change', onPhotoSelect);
 
@@ -126,5 +126,3 @@ effectsList.addEventListener('change', onEffectChange);
 inputHashtags.addEventListener('input', onHashtagInput);
 
 inputDescription.addEventListener('input', onCommentInput);
-
-export { onFormSubmit, onImgUploadClose };
